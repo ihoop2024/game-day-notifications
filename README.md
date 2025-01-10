@@ -1,15 +1,15 @@
 # NBA Game Day Notifications / Sports Alerts System
 
 ## **Project Overview**
-This project is an alert system that sends real-time NBA game day score notifications to subscribed users via SMS/Email. It leverages **Amazon SNS**, **AWS Lambda and Python**, **Amazon EvenBridge** and **NBA APIs** to provide sports fans with up-to-date game information. The project demonstrates cloud computing principles and efficient notification mechanisms.
+This project fetches NBA game data for the current date (adjusted to Central Time), formats the data into readable messages, and publishes updates to an SNS topic for distribution (e.g., to emails or SMS). It leverages **Amazon SNS**, **AWS Lambda and Python**, **Amazon EvenBridge** and **NBA APIs** to provide sports fans with up-to-date game information. The project demonstrates cloud computing principles and efficient notification mechanisms.
 
 ---
 
 ## **Features**
 - Fetches live NBA game scores using an external API.
 - Sends formatted score updates to subscribers via SMS/Email using Amazon SNS.
-- Scheduled automation for regular updates using Amazon EventBridge.
-- Designed with security in mind, following the principle of least privilege for IAM roles.
+- Scheduled automation utilizing cron jobs for regular updates using Amazon EventBridge.
+- Designed and implemented with security in mind, following the principle of least privilege for IAM roles.
 
 ## **Prerequisites**
 - Free account with subscription and API Key at [sportsdata.io](https://sportsdata.io/)
@@ -18,7 +18,7 @@ This project is an alert system that sends real-time NBA game day score notifica
 ---
 
 ## **Technical Architecture**
-![nba_API](https://github.com/user-attachments/assets/5e19635e-0685-4c07-9601-330f7d1231f9)
+<img width="957" alt="Screenshot 2025-01-09 at 9 30 53 PM" src="https://github.com/user-attachments/assets/6c8c85c1-7a38-48cb-9efb-054dcbaf2db6" />
 
 
 ---
@@ -62,6 +62,10 @@ cd game-day-notifications
 4. Name the topic (e.g., gd_topic) and note the ARN.
 5. Click Create Topic.
 
+![Screenshot 2025-01-09 at 9 35 15 PM](https://github.com/user-attachments/assets/79c6a04b-c263-4d68-85df-55be76a44b38)
+
+   
+
 ### **Add Subscriptions to the SNS Topic**
 1. After creating the topic, click on the topic name from the list.
 2. Navigate to the Subscriptions tab and click Create subscription.
@@ -72,12 +76,19 @@ cd game-day-notifications
 - For SMS (phone number):
   - Choose SMS.
   - Enter a valid phone number in international format (e.g., +1234567890).
+  - I chose Email.
+ 
+  <img width="735" alt="Screenshot 2025-01-09 at 9 27 47 PM" src="https://github.com/user-attachments/assets/c6cb6bb6-b870-4fbb-8e12-0d7bb99eae19" />
+
 
 4. Click Create Subscription.
 5. If you added an Email subscription:
 - Check the inbox of the provided email address.
 - Confirm the subscription by clicking the confirmation link in the email.
 6. For SMS, the subscription will be immediately active after creation.
+
+![Screenshot 2025-01-09 at 9 37 00 PM](https://github.com/user-attachments/assets/da29fad4-01e0-4ef2-a8bf-be8ce8b161d2)
+
 
 ### **Create the SNS Publish Policy**
 1. Open the IAM service in the AWS Management Console.
@@ -88,6 +99,9 @@ cd game-day-notifications
 6. Click Next: Review.
 7. Enter a name for the policy (e.g., gd_sns_policy).
 8. Review and click Create Policy.
+
+![Screenshot 2025-01-09 at 9 40 35 PM](https://github.com/user-attachments/assets/e990d500-27c5-4957-9278-ad6e2afa4ecf)
+
 
 ### **Create an IAM Role for Lambda**
 1. Open the IAM service in the AWS Management Console.
@@ -101,6 +115,9 @@ cd game-day-notifications
 7. Enter a name for the role (e.g., gd_role).
 8. Review and click Create Role.
 9. Copy and save the ARN of the role for use in the Lambda function.
+
+![Screenshot 2025-01-09 at 9 53 55 PM](https://github.com/user-attachments/assets/3bd74b95-3a10-4b3b-aecf-06fd504779a9)
+
 
 ### **Deploy the Lambda Function**
 1. Open the AWS Management Console and navigate to the Lambda service.
@@ -118,12 +135,19 @@ cd game-day-notifications
 9. Click Create Function.
 
 
+![Screenshot 2025-01-09 at 9 57 35 PM](https://github.com/user-attachments/assets/01418341-26e0-4013-86f6-3c72d5bd6d61)
+This script Fetches NBA game data for the current date (adjusted to Central Time), processes and transforms the data into user-friendly messages, and publishes the updates to an Amazon SNS topic for distribution via email or SMS.
+
+
 ### **Set Up Automation with Eventbridge**
 1. Navigate to the Eventbridge service in the AWS Management Console.
 2. Go to Rules → Create Rule.
 3. Select Event Source: Schedule.
 4. Set the cron schedule for when you want updates (e.g., hourly).
 5. Under Targets, select the Lambda function (gd_notifications) and save the rule.
+
+![Screenshot 2025-01-09 at 10 03 39 PM](https://github.com/user-attachments/assets/45f678ed-8ea1-45d4-aa87-39caa0b3761c)
+
 
 
 ### **Test the System**
@@ -132,12 +156,26 @@ cd game-day-notifications
 3. Run the function and check CloudWatch Logs for errors.
 4. Verify that SMS notifications are sent to the subscribed users.
 
+<img width="373" alt="Screenshot 2025-01-09 at 9 01 54 PM" src="https://github.com/user-attachments/assets/7f295a16-45df-466b-b8d7-dbf0797c8c43" />
+
+
 
 ### **What We Learned**
-1. Designing a notification system with AWS SNS and Lambda.
+1. Designing and depolying a notification system via AWS SNS and Lambda.
 2. Securing AWS services with least privilege IAM policies.
-3. Automating workflows using EventBridge.
+3. Automating scheduled workflows via cron jobs using EventBridge.
 4. Integrating external APIs into cloud-based workflows.
+
+### **Challenges**
+1. Lambda function initially faiiled to run due to time out
+2. Navigated to the Lambda function 'gd_notifications' in the AWS Console
+3. Select the 'Configuration' tab
+4. Click on 'General configuration' in the left sidebar
+5. Click the 'Edit' button
+6. Increased the 'Timeout' value from 3 seconds to 30 seconds, to allow more time to execute my function due to complexity.
+7. Click 'Save' to apply the changes
+8. Resolved
+
 
 
 ### **Future Enhancements**
